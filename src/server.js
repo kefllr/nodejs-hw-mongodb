@@ -21,6 +21,7 @@ const setupServer = () => {
     });
 
     app.get('/contacts/:contactId', async(req, res)=>{ 
+       try{ 
         console.log(req.params);
         const id = req.params.contactId;
         const contacts = await getContactsId(id);
@@ -32,10 +33,17 @@ const setupServer = () => {
         });
     }else{
         res.status(404).json({
-            status: `${res.status}`,
-            message:`Not found contact with id ${id}!`
+            status: `${res.statusCode}`,
+          message: `Not found contact with id ${id}!`,
         });
     }
+    }catch(err){
+        res.status(500).json({
+            status: '500',
+            message: 'Error retrieving contact',
+            error: err.message,
+          });
+        };
     });
 
     app.use(
