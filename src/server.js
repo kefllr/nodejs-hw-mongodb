@@ -24,12 +24,18 @@ const setupServer = () => {
         console.log(req.params);
         const id = req.params.contactId;
         const contacts = await getContactsId(id);
-       
+       if(contacts){
         res.json({
             status: 200,
             message: `Successfully found contact with id ${id}!`,
             data: contacts,
         });
+    }else{
+        res.status(404).json({
+            status: `${res.status}`,
+            message:`Not found contact with id ${id}!`
+        });
+    }
     });
 
     app.use(
