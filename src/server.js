@@ -1,6 +1,7 @@
 import express from 'express' ;
 import pino from 'pino-http';
 import cors from 'cors';
+import mongoose from 'mongoose';
 import { env } from './untils/env.js';
 import { getContacts, getContactsId } from './services/contacts.js';
 
@@ -20,30 +21,38 @@ const setupServer = () => {
         });
     });
 
-    app.get('/contacts/:contactId', async(req, res)=>{ 
-       try{ 
-        console.log(req.params);
-        const id = req.params.contactId;
-        const contacts = await getContactsId(id);
-       if(contacts){
-        res.json({
-            status: 200,
-            message: `Successfully found contact with id ${id}!`,
-            data: contacts,
-        });
-    }else{
-        res.status(404).json({
-            status: `${res.statusCode}`,
-          message: `Not found contact with id ${id}!`,
-        });
-    }
-    }catch(err){
-        res.status(500).json({
-            status: '500',
-            message: 'Error retrieving contact',
-            error: err.message,
-          });
-        };
+    app.get('/contacts/:contactId', async (req, res) => {
+        try {
+            const id = req.params.contactId;
+    
+            if (!mongoose.isValidObjectId(id)) {
+                return res.status(400).json({
+                    status: 400,
+                    message: `Invalid contact ID format: ${id}`
+                });
+            }
+    
+            const contact = await getContactsId(id);
+    
+            if (contact) {
+                res.json({
+                    status: 200,
+                    message: `Successfully found contact with id ${id}!`,
+                    data: contact,
+                });
+            } else {
+                res.status(404).json({
+                    status: 404,
+                    message: `Not found contact with id ${id}!`,
+                });
+            }
+        } catch (err) {
+            res.status(500).json({
+                status: 500,
+                message: 'Error retrieving contact',
+                error: err.message,
+            });
+        }
     });
 
     app.use(
