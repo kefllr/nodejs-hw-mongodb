@@ -10,7 +10,10 @@ import errorHandler from './middlewares/errorHandler.js';
 const setupServer = () => {
     const app = express();
 
-    app.use(express.json());
+    app.use(express.json({
+      type: ['application/json', 'application/vnd.api+json'],
+      limit: '100kb',
+    }));
     app.use(cors());
 
     app.use(contactRouter);
@@ -22,6 +25,12 @@ const setupServer = () => {
       },
     }),
       );
+
+      app.get('/', (req, res) => {
+        res.json({
+          message: 'Hello World!',
+        });
+      });
     
     app.use('*', notFoundHandler); 
 
