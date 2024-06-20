@@ -2,9 +2,13 @@ import { createContacts, deleteContacts, getContacts, patchContacts } from "../s
 import { getContactsId } from "../services/contacts.js";
 import createHttpError from 'http-errors';
 import mongoose from "mongoose";
+import { parsePaginationParams } from "../untils/parsePaginationParams.js";
 
 export const contactsController = async(req, res, )=>{
-    const contacts = await getContacts();
+    const {page, perPage} = parsePaginationParams(req.query);
+    const {sortBy, sortOrder} = req.query;
+    const {isFavourite} = req.query;
+    const contacts = await getContacts(page, perPage, sortBy, sortOrder, isFavourite);
     res.json({
         status: 200,
         message: 'Successfully found contacts!',

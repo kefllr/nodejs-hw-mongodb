@@ -1,7 +1,46 @@
 import { Contact } from "../db/contact.js";
 
-export const getContacts = async () =>{
-    return await Contact.find({});
+const createPaginationInfo = (page, perPage, count)=>{
+    const totalPages = Math.ceil(count / perPage);
+    const hasNextPage = page < totalPages;
+    const hasPreviousPage = page > 1;
+    return{
+        page,
+        perPage,
+        totalItems: count,
+        totalPages,
+        hasPreviousPage,
+        hasNextPage
+    };
+};
+
+export const getContacts = async (
+        page = 1, 
+        perPage = 10, 
+        sortBy = '_id', 
+        sortOrder = 'asc',
+        isFavourite = {}) =>{
+    
+
+   
+
+    const skip = perPage * (page - 1);
+    
+
+    const contactFiter = Contact.find();
+    if(isFavourite){
+        contactFiter.where('isFavourite').equals(isFavourite);
+    };
+
+    const contactCount = await Contact.find().merge(contactFiter).countDocuments();
+    
+    const paginationInfo = createPaginationInfo(page,perPage,contactCount);
+
+    const contacts = (await Contact.find().merge(contactFiter).skip(skip).limit(perPage).sort({[sortBy]: sortOrder,}).exec());
+    return {
+        contacts,
+        ...paginationInfo,
+    };
 };
 export const getContactsId = async (id) => {
     return await Contact.findById(id);
