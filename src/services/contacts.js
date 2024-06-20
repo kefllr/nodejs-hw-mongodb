@@ -19,7 +19,7 @@ export const getContacts = async (
         perPage = 10, 
         sortBy = '_id', 
         sortOrder = 'asc',
-        isFavourite = {}) =>{
+        isFavourite = false) =>{
     
 
    
