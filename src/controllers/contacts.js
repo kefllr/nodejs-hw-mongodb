@@ -4,11 +4,14 @@ import createHttpError from 'http-errors';
 import mongoose from "mongoose";
 import { parsePaginationParams } from "../untils/parsePaginationParams.js";
 
+
 export const contactsController = async(req, res, )=>{
     const {page, perPage} = parsePaginationParams(req.query);
     const {sortBy, sortOrder} = req.query;
     const {isFavourite} = req.query;
-    const contacts = await getContacts(page, perPage, sortBy, sortOrder, isFavourite);
+    const userId = req.user._id;
+
+    const contacts = await getContacts(page, perPage, sortBy, sortOrder, isFavourite, userId);
     res.json({
         status: 200,
         message: 'Successfully found contacts!',
@@ -18,7 +21,7 @@ export const contactsController = async(req, res, )=>{
 
 export const createContactControler = async(req, res) =>{
     const {body} = req;
-    const contacts = await createContacts(body);
+    const contacts = await createContacts(body, req.user._id) ;
 
     res.status(201).json({
         status: 201,
@@ -30,7 +33,7 @@ export const createContactControler = async(req, res) =>{
 
 export const deleteContactControler = async(req, res, next) =>{
     const id = req.params.contactId;
-     const contact = await deleteContacts(id);
+     const contact = await deleteContacts(id, req.user._id);
 
     if (!contact) {
         next(createHttpError(404, 'Contact not found'));
@@ -43,7 +46,7 @@ export const deleteContactControler = async(req, res, next) =>{
 
 export const patchContactControler = async(req, res, next) =>{
     const { contactId } = req.params;
-    const result = await patchContacts(contactId, req.body);
+    const result = await patchContacts(contactId, req.user._id, req.body);
   
     if (!result) {
       next(createHttpError(404, 'Contact not found'));
@@ -70,7 +73,7 @@ export const contactsIdController = async (req, res) => {
             });
         }
 
-        const contact = await getContactsId(id);
+        const contact = await getContactsId(id, req.user._id);
 
         if (contact) {
             res.json({

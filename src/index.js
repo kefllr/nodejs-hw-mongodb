@@ -1,6 +1,6 @@
 import setupServer from "./server.js";
 import initMongoConnection from './db/initMongoConnection.js';
-import { Contact } from "./db/contact.js";
+import { Contact } from "./db/models/contact.js";
 
 const bootstrap = async () => {
   await initMongoConnection();

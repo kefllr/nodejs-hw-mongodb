@@ -2,9 +2,10 @@ import express from 'express' ;
 import pino from 'pino-http';
 import cors from 'cors';
 import { env } from './untils/env.js';
-import contactRouter from './routers/contacts.js';
 import notFoundHandler from './middlewares/notFoundHandler.js';
 import errorHandler from './middlewares/errorHandler.js';
+import rootRouter from './routers/index.js';
+import cookiesParser from 'cookie-parser';
 
 
 const setupServer = () => {
@@ -16,7 +17,9 @@ const setupServer = () => {
     }));
     app.use(cors());
 
-    app.use(contactRouter);
+    app.use(cookiesParser());
+
+    app.use(rootRouter);
 
     app.use(
     pino({
