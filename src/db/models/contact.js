@@ -24,6 +24,7 @@ const contactSchema = new Schema({
         required: true
     },
     parentId: {type: Schema.ObjectId, required: true},
+    photoUrl: {type: String},
 }, {
     timestamps: true 
 });

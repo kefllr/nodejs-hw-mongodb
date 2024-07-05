@@ -1,4 +1,6 @@
 import { Contact } from "../db/models/contact.js";
+import { saveFile } from "../untils/saveFile.js";
+
 
 const createPaginationInfo = (page, perPage, count)=>{
     const totalPages = Math.ceil(count / perPage);
@@ -48,8 +50,9 @@ export const getContactsId = async (contactId) => {
     return await Contact.findOne({_id: contactId});
 };
 
-export const createContacts = async (payload, userId) =>{
-    return await Contact.create({...payload,parentId: userId});
+export const createContacts = async ({photo, ...payload}, userId) =>{
+  const url = await saveFile(photo);
+    return await Contact.create({...payload,parentId: userId,  photoUrl: url});
 };
 
 export const deleteContacts = async (contactId, userId) =>{
@@ -71,11 +74,9 @@ export const patchContacts = async (
         ...options,
       },
     );
+  
     if (!rawResult || !rawResult.value) return null;
   
-    return {
-      contact: rawResult.value,
-      isNew: Boolean(rawResult?.lastErrorObject?.upserted),
-    };
+    return rawResult.value;
   };
   

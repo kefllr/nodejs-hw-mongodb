@@ -6,6 +6,7 @@ import validateId from "../middlewares/validateId.js";
 import {validateBody} from "../middlewares/validateBody.js";
 import {createContactSchema, updateContactSchema } from "../validation/createContactSchema.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import { upload } from "../middlewares/upload.js";
 
  const contactRouter = Router();
 
@@ -13,13 +14,13 @@ contactRouter.use('/', authenticate);
 
 contactRouter.get('/', ctrlWrapper(contactsController));
 
-contactRouter.post('/',validateBody(createContactSchema), ctrlWrapper(createContactControler));
+contactRouter.post('/', upload.single('photo'), validateBody(createContactSchema), ctrlWrapper(createContactControler));
 
-contactRouter.get('/:contactId',validateId('contactId'), ctrlWrapper(contactsIdController));
+contactRouter.get('/:contactId', validateId('contactId'), ctrlWrapper(contactsIdController));
 
 contactRouter.delete('/:contactId',validateId('contactId'), ctrlWrapper(deleteContactControler));
 
-contactRouter.patch('/:contactId',validateBody(updateContactSchema),validateId('contactId'), ctrlWrapper(patchContactControler));
+contactRouter.patch('/:contactId',upload.single('photo'),validateBody(updateContactSchema),validateId('contactId'), ctrlWrapper(patchContactControler));
 
 
 

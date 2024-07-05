@@ -6,6 +6,7 @@ import notFoundHandler from './middlewares/notFoundHandler.js';
 import errorHandler from './middlewares/errorHandler.js';
 import rootRouter from './routers/index.js';
 import cookiesParser from 'cookie-parser';
+import { UPLOAD_DIR } from './constans/index.js';
 
 
 const setupServer = () => {
@@ -18,6 +19,8 @@ const setupServer = () => {
     app.use(cors());
 
     app.use(cookiesParser());
+
+    app.use('/upload', express.static(UPLOAD_DIR));
 
     app.use(rootRouter);
 

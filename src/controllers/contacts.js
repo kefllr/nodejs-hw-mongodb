@@ -3,6 +3,11 @@ import { getContactsId } from "../services/contacts.js";
 import createHttpError from 'http-errors';
 import mongoose from "mongoose";
 import { parsePaginationParams } from "../untils/parsePaginationParams.js";
+import { ENV_VARS } from "../constans/index.js";
+import { saveToCloudinary } from "../untils/saveToCloudinary.js";
+import { saveFileToLocalMachine } from "../untils/saveFileToLocalMachine.js";
+import { env } from "../untils/env.js";
+
 
 
 export const contactsController = async(req, res, )=>{
@@ -20,8 +25,8 @@ export const contactsController = async(req, res, )=>{
 };
 
 export const createContactControler = async(req, res) =>{
-    const {body} = req;
-    const contacts = await createContacts(body, req.user._id) ;
+    const {body, file} = req;
+    const contacts = await createContacts({...body, photo: file}, req.user._id) ;
 
     res.status(201).json({
         status: 201,
@@ -44,19 +49,40 @@ export const deleteContactControler = async(req, res, next) =>{
 
 };
 
-export const patchContactControler = async(req, res, next) =>{
+export const patchContactControler = async(req, res) =>{
     const { contactId } = req.params;
-    const result = await patchContacts(contactId, req.user._id, req.body);
-  
-    if (!result) {
-      next(createHttpError(404, 'Contact not found'));
-      return;
+    const photo = req.file;
+    const userId = req.user._id;
+
+    let photoUrl;
+
+    if (photo) {
+        if (env(ENV_VARS.IS_CLOUDINARY_ENABLED) === 'true') {
+        photoUrl = await saveToCloudinary(photo);
+        } else {
+        photoUrl = await saveFileToLocalMachine(photo);
+        }
     }
-  
-    res.json({
-      status: 200,
-      message: `Successfully patched a contact!`,
-      data: result.contact,
+
+    const patch = req.body;
+
+    const result = await patchContacts(contactId, userId, {
+        ...patch,
+        photo: photoUrl,
+    });
+
+    if (!result || !contactId) {
+        return res.status(404).json({
+        status: '404',
+        message: 'Contact not found',
+        data: null,
+        });
+    }
+
+    res.status(200).json({
+        status: '200',
+        message: 'Successfully patched a contact!',
+        data: result,
     });
   };
 
@@ -73,7 +99,7 @@ export const contactsIdController = async (req, res) => {
             });
         }
 
-        const contact = await getContactsId(id, req.user._id);
+        const contact = await getContactsId(id);
 
         if (contact) {
             res.json({

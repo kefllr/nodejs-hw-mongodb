@@ -3,6 +3,14 @@ import { User } from "../db/models/user.js";
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { Session } from "../db/models/session.js";
+import jwt from 'jsonwebtoken';
+import { env } from "../untils/env.js";
+import { ENV_VARS, TEMPLATE_DIR } from "../constans/index.js";
+import { sendMail } from "../untils/sendMail.js";
+import Handlebars from "handlebars";
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
 
 
 const createSession = () => {
@@ -82,4 +90,63 @@ export const refreshSession = async ({sessionId, sessionToken}) =>{
         userId: user._id,
         ...newSessionData
     });
+};
+
+export const sendResetPassword = async (email) =>{
+    const user = await User.findOne({email});
+    if (!user) {
+        throw createHttpError(404, 'User not found!');
+    }
+
+    const token = jwt.sign(
+        {
+          sub: user._id,
+          email,
+        },
+        env(ENV_VARS.JWT_SECRET),
+        {
+          expiresIn: '5m',
+        },
+      );
+
+      const templateSource = await fs.readFile(path.join(TEMPLATE_DIR, 'send-reset-password.html'));
+
+      const template = Handlebars.compile(templateSource.toString());
+
+      const html = template({
+        name: user.name,
+        link: `${env(ENV_VARS.APP_DOMAIN)}/send-reset-email?token=${token}`
+      });
+
+    try {
+         await sendMail({
+        html,
+        to: email,
+        from: env(ENV_VARS.SMTP_FROM),
+        subject: 'reset u pasword'
+    });
+    } catch (error) {
+        console.log(error);
+        throw createHttpError(500, 'problem with sending email');
+    }
+   
+};
+
+export const resetPassword = async ({token, password}) =>{
+    let tokenPayload;
+    try{
+        tokenPayload = jwt.verify(token, env(ENV_VARS.JWT_SECRET));
+    }catch(err){
+       throw createHttpError(401, err.message);
+    };
+    
+
+    const hashPassword = await bcrypt.hash(password, 10);
+    
+    await User.findOneAndUpdate({
+        _id: tokenPayload.sub, 
+        email: tokenPayload.email
+    },{password:hashPassword},
+    {new: true}
+);
 };
