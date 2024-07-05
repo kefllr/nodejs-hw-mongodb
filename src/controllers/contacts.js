@@ -73,7 +73,7 @@ export const contactsIdController = async (req, res) => {
             });
         }
 
-        const contact = await getContactsId(id, req.user._id);
+        const contact = await getContactsId(id);
 
         if (contact) {
             res.json({
