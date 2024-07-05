@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import cloudinary  from 'cloudinary';
 import { env } from './env.js';
 import { ENV_VARS } from '../constans/index.js';
 import fs from "node:fs/promises";
