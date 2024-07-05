@@ -4,7 +4,7 @@ import createHttpError from 'http-errors';
 import mongoose from "mongoose";
 import { parsePaginationParams } from "../untils/parsePaginationParams.js";
 
-import { saveToCloudinary } from "../untils/saveToCloudinary.js";
+import saveToCloudinary  from "../untils/saveToCloudinary.js";
 import { saveFileToLocalMachine } from "../untils/saveFileToLocalMachine.js";
 import { env } from "../untils/env.js";
 
