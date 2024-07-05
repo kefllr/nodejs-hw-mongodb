@@ -3,7 +3,7 @@ import { getContactsId } from "../services/contacts.js";
 import createHttpError from 'http-errors';
 import mongoose from "mongoose";
 import { parsePaginationParams } from "../untils/parsePaginationParams.js";
-import { ENV_VARS } from "../constans/index.js";
+
 import { saveToCloudinary } from "../untils/saveToCloudinary.js";
 import { saveFileToLocalMachine } from "../untils/saveFileToLocalMachine.js";
 import { env } from "../untils/env.js";
@@ -57,7 +57,7 @@ export const patchContactControler = async(req, res) =>{
     let photoUrl;
 
     if (photo) {
-        if (env(ENV_VARS.IS_CLOUDINARY_ENABLED) === 'true') {
+        if (env('IS_CLOUDINARY_ENABLED') === 'true') {
         photoUrl = await saveToCloudinary(photo);
         } else {
         photoUrl = await saveFileToLocalMachine(photo);
