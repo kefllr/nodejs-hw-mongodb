@@ -1,8 +1,7 @@
 import cloudinary  from 'cloudinary';
 import { env } from './env.js';
 import { ENV_VARS } from '../constans/index.js';
-
-
+import fs from 'node:fs/promises';
 
 
 cloudinary.v2.config({
@@ -15,6 +14,7 @@ cloudinary.v2.config({
 const saveToCloudinary = async (file) =>{
 
     const res = await cloudinary.v2.uploader.upload(file.path); 
+    await fs.unlink(file.path);
     return res.secure_url;
 };
 export default saveToCloudinary;
