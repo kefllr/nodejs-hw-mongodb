@@ -10,6 +10,7 @@ import { sendMail } from "../untils/sendMail.js";
 import Handlebars from "handlebars";
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { getFullNameFromGoogleTokenPayload, validateCode } from "../untils/googleOAuth.js";
 
 
 
@@ -150,3 +151,26 @@ export const resetPassword = async ({token, password}) =>{
     {new: true}
 );
 };
+
+export const loginOrSignupWithGoogle = async (code) => {
+    const loginTicket = await validateCode(code);
+    const payload = loginTicket.getPayload();
+    if (!payload) throw createHttpError(401);
+  
+    let user = await User.findOne({ email: payload.email });
+    if (!user) {
+      const password = await bcrypt.hash(crypto.randomBytes(10), 10);
+      user = await User.create({
+        email: payload.email,
+        name: getFullNameFromGoogleTokenPayload(payload),
+        password,
+      });
+    }
+  
+    const newSession = createSession();
+  
+    return await Session.create({
+      userId: user._id,
+      ...newSession,
+    });
+  };

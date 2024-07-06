@@ -1,0 +1,43 @@
+type: object
+required:
+  - name
+  - phoneNumber
+  - email
+  - isFavourite
+  - contactType
+  - photo
+  - parentId
+properties:
+  name:
+    description: "Contact's name"
+    type: string
+    example: 'Mel Gibson'
+  phoneNumber:
+    description: "Contact's phone number"
+    type: string
+    example: '+3801111111'
+  email:
+    description: "Contact's email"
+    type: string
+    example: 'MEEELLL@ui.com'
+  isFavourite:
+    description: 'True if contact is favourite'
+    type: boolean
+    example: true
+  contactType:
+    description: "Contact's type"
+    type: string
+    enum: ['work', 'home', 'personal']
+    example: 'work' 
+  photo:
+    oneOf:
+      - type: string
+        example: some-url
+      - type: 'null'
+        example: null
+  parentId:
+    oneOf:
+      - type: string
+        example: '65e4decdd286b30065d54af9'
+      - type: 'null'
+        example: null
