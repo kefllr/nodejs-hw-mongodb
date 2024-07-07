@@ -62,29 +62,30 @@ export const patchContactControler = async(req, res, next) =>{
 
 
 
-export const contactsIdController = async (req, res) => {
+  export const contactsIdController = async (req, res) => {
     try {
-        const id = req.params.contactId;
+        const { contactId } = req.params;
+        const { userId } = req.user; 
 
-        if (!mongoose.isValidObjectId(id)) {
+        if (!mongoose.isValidObjectId(contactId)) {
             return res.status(400).json({
                 status: 400,
-                message: `Invalid contact ID format: ${id}`
+                message: `Invalid contact ID format: ${contactId}`
             });
         }
 
-        const contact = await getContactsId(id);
+        const contact = await getContactsId(contactId, userId);
 
         if (contact) {
-            res.json({
+            res.status(200).json({
                 status: 200,
-                message: `Successfully found contact with id ${id}!`,
+                message: `Successfully found contact with id ${contactId}!`,
                 data: contact,
             });
         } else {
             res.status(404).json({
                 status: 404,
-                message: `Not found contact with id ${id}!`,
+                message: `Not found contact with id ${contactId} or you do not have permission to access it!`,
             });
         }
     } catch (err) {

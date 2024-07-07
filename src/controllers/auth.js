@@ -11,14 +11,21 @@ const setupSession = (res, session) =>{
     });
 };
 
-export const registerUserControler = async (req, res) => {
-
-    const user = await createUser(req.body);
-    res.json({
-        status: 201,
-        message:'Successfully registered a user!',
-        data: {user},
-    });
+export const registerUserController = async (req, res) => {
+    try {
+        const user = await createUser(req.body);
+        res.status(201).json({
+            status: 201,
+            message: 'Successfully registered a user!',
+            data: { user },
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 500,
+            message: 'Error registering user',
+            error: error.message,
+        });
+    }
 };
 
 export const loginUserControler= async (req, res) => {
