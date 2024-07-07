@@ -1,3 +1,4 @@
+import createHttpError from "http-errors";
 import { Contact } from "../db/models/contact.js";
 import { saveFile } from "../untils/saveFile.js";
 
@@ -59,24 +60,30 @@ export const deleteContacts = async (contactId, userId) =>{
     return await Contact.findOneAndDelete({_id: contactId, parentId: userId});
 };
 
-export const patchContacts = async (
-    contactId,
-    userId,
-    payload,
-    options = {},
-  ) => {
-    const rawResult = await Contact.findOneAndUpdate(
-      { _id: contactId, userId },
-      payload,
-      {
-        new: true,
-        includeResultMetadata: true,
-        ...options,
-      },
-    );
-  
-    if (!rawResult || !rawResult.value) return null;
-  
-    return rawResult.value;
+export const patchContact = async (
+  id,
+  { photo, ...payload },
+  options = {},
+) => {
+  const url = await saveFile(photo);
+
+  const rawResult = await Contact.findByIdAndUpdate(
+    id,
+    { ...payload, photoUrl: url },
+    {
+      new: true,
+      includeResultMetadata: true,
+      ...options,
+    },
+  );
+
+  if (!rawResult || !rawResult.value) {
+    throw createHttpError(404, 'Contact not found');
+  }
+
+  return {
+    student: rawResult.value,
+    isNew: !rawResult?.lastErrorObject?.updatedExisting,
   };
+};
   

@@ -1,12 +1,12 @@
-import { createContacts, deleteContacts, getContacts, patchContacts } from "../services/contacts.js";
+import { createContacts, deleteContacts, getContacts, patchContact } from "../services/contacts.js";
 import { getContactsId } from "../services/contacts.js";
 import createHttpError from 'http-errors';
 import mongoose from "mongoose";
 import { parsePaginationParams } from "../untils/parsePaginationParams.js";
 
-import saveToCloudinary  from "../untils/saveToCloudinary.js";
-import { saveFileToLocalMachine } from "../untils/saveFileToLocalMachine.js";
-import { env } from "../untils/env.js";
+// import saveToCloudinary  from "../untils/saveToCloudinary.js";
+// import { saveFileToLocalMachine } from "../untils/saveFileToLocalMachine.js";
+// import { env } from "../untils/env.js";
 
 
 
@@ -49,41 +49,16 @@ export const deleteContactControler = async(req, res, next) =>{
 
 };
 
-export const patchContactControler = async(req, res) =>{
+export const patchContactController = async (req, res) => {
+    const { body, file } = req;
     const { contactId } = req.params;
-    const photo = req.file;
-    const userId = req.user._id;
-
-    let photoUrl;
-
-    if (photo) {
-        if (env('IS_CLOUDINARY_ENABLED') === 'true') {
-        photoUrl = await saveToCloudinary(photo);
-        } else {
-        photoUrl = await saveFileToLocalMachine(photo);
-        }
-    }
-
-    const patch = req.body;
-
-    const result = await patchContacts(contactId, userId, {
-        ...patch,
-        photo: photoUrl,
-    });
-
-    if (!result || !contactId) {
-        return res.status(404).json({
-        status: '404',
-        message: 'Contact not found',
-        data: null,
-        });
-    }
-
+    const { contact } = await patchContact(contactId, { ...body, photo: file });
+  
     res.status(200).json({
-        status: '200',
-        message: 'Successfully patched a contact!',
-        data: result,
-    });
+      status: 200,
+      message: `Successfully patched contact!`,
+      data: contact,
+    });  
   };
 
 
