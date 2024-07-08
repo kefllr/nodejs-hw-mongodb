@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { contactsController, contactsIdController, createContactControler, deleteContactControler, patchContactControler } from "../controllers/contacts.js";
+import { contactsController, contactsIdController, createContactControler, deleteContactControler, patchContactController } from "../controllers/contacts.js";
 import { ctrlWrapper } from "../untils/ctrlWrapper.js";
 import validateId from "../middlewares/validateId.js";
 import {validateBody} from "../middlewares/validateBody.js";
@@ -20,7 +20,7 @@ contactRouter.get('/:contactId', validateId('contactId'), ctrlWrapper(contactsId
 
 contactRouter.delete('/:contactId',validateId('contactId'), ctrlWrapper(deleteContactControler));
 
-contactRouter.patch('/:contactId',upload.single('photo'),validateBody(updateContactSchema),validateId('contactId'), ctrlWrapper(patchContactControler));
+contactRouter.patch('/:contactId',upload.single('photo'),validateBody(updateContactSchema),validateId('contactId'), ctrlWrapper(patchContactController));
 
 
 

@@ -1,4 +1,4 @@
-import { createUser, loginOrSignupWithGoogle,loginUser, logoutUser, refreshSession, resetPassword, sendResetPassword } from "../services/auth.js";
+import { createUser,loginOrSignupWithGoogleOAuth,loginUser, logoutUser, refreshSession, resetPassword, sendResetPassword } from "../services/auth.js";
 import { generateOAuthURL } from "../untils/googleOAuth.js";
 
 const setupSession = (res, session) =>{
@@ -86,15 +86,15 @@ export const getOAuthUrlControler = async (req, res) =>{
     });
 };
 
-export const loginWithGoogleController = async (req, res) => {
-    const session = await loginOrSignupWithGoogle(req.body.code);
+export const verifyGoogleOAuthController = async (req, res) => {
+    const { code } = req.body;
+    const session = await loginOrSignupWithGoogleOAuth(code);
+  
     setupSession(res, session);
   
     res.json({
       status: 200,
-      message: 'Successfully logged in via Google OAuth!',
-      data: {
-        accessToken: session.accessToken,
-      },
+      message: 'Logged in with Google OAuth!',
+      data: { accessToken: session.accessToken },
     });
   };
