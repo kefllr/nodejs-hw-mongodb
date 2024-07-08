@@ -106,7 +106,7 @@ export const sendResetPassword = async (email) => {
       },
       env(ENV_VARS.JWT_SECRET),
       {
-        expiresIn: 1,
+        expiresIn: '15m',
       },
     );
   
