@@ -122,17 +122,12 @@ export const sendResetPassword = async (email) => {
     link: `${env(ENV_VARS.APP_DOMAIN)}/reset-password?token=${token}`,
   });
 
-  try {
     await sendMail({
       html,
       to: email,
       from: env(ENV_VARS.SMTP_FROM),
       subject: 'Reset your password!',
     });
-  } catch (err) {
-    console.log(err);
-    throw createHttpError(500, 'Problem with sending emails');
-  }
 };
 
 export const resetPassword = async ({token, password}) =>{
