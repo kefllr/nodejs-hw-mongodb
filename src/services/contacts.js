@@ -82,7 +82,7 @@ export const patchContacts = async (
   }
 
   return {
-    student: rawResult.value,
+    contact: rawResult.value,
     isNew: !rawResult?.lastErrorObject?.updatedExisting,
   };
 };

@@ -93,44 +93,46 @@ export const refreshSession = async ({sessionId, sessionToken}) =>{
     });
 };
 
-export const sendResetPassword = async (email) =>{
-    const user = await User.findOne({email});
-    if (!user) {
-        throw createHttpError(404, 'User not found!');
-    }
+export const sendResetPassword = async (email) => {
+  const user = await User.findOne({ email });
 
-    const token = jwt.sign(
-        {
-          sub: user._id,
-          email,
-        },
-        env(ENV_VARS.JWT_SECRET),
-        {
-          expiresIn: '5m',
-        },
-      );
+  if (!user) {
+    throw createHttpError(404, 'User is not found!');
+  }
 
-      const templateSource = await fs.readFile(path.join(TEMPLATE_DIR, 'send-reset-password.html'));
+  const token = jwt.sign(
+    {
+      sub: user._id,
+      email,
+    },
+    env(ENV_VARS.JWT_SECRET),
+    {
+      expiresIn: '5m',
+    },
+  );
 
-      const template = Handlebars.compile(templateSource.toString());
+  const templateSource = await fs.readFile(
+    path.join(TEMPLATE_DIR, 'send-reset-password.html'),
+  );
 
-      const html = template({
-        name: user.name,
-        link: `${env(ENV_VARS.APP_DOMAIN)}/send-reset-email?token=${token}`
-      });
+  const template = Handlebars.compile(templateSource.toString());
 
-    try {
-         await sendMail({
-        html,
-        to: email,
-        from: env(ENV_VARS.SMTP_FROM),
-        subject: 'reset u pasword'
+  const html = template({
+    name: user.name,
+    link: `${env(ENV_VARS.APP_DOMAIN || ENV_VARS.RENDER_APP_DOMAIN)}/reset-password?token=${token}`,
+  });
+
+  try {
+    await sendMail({
+      html,
+      to: email,
+      from: env(ENV_VARS.SMTP_FROM),
+      subject: 'Reset your password!',
     });
-    } catch (error) {
-        console.log(error);
-        throw createHttpError(500, 'problem with sending email');
-    }
-   
+  } catch (err) {
+    console.log(err);
+    throw createHttpError(500, 'Problem with sending emails');
+  }
 };
 
 export const resetPassword = async ({token, password}) =>{

@@ -1,15 +1,16 @@
 import createHttpError from 'http-errors';
-import swaggerUI from 'swagger-ui-express';
 import fs from 'node:fs';
-
+import swaggerUi from 'swagger-ui-express';
 import { SWAGGER_PATH } from '../constans/index.js';
 
 export const swagger = () => {
   try {
-    const swaggerDoc = JSON.parse(fs.readFileSync(SWAGGER_PATH).toString());
-    return [...swaggerUI.serve, swaggerUI.setup(swaggerDoc)];
+    const swaggerDocument = JSON.parse(
+      fs.readFileSync(SWAGGER_PATH).toString(),
+    );
+    return [...swaggerUi.serve, swaggerUi.setup(swaggerDocument)];
   } catch (err) {
     return (req, res, next) =>
-      next(createHttpError(500, "Can't load swagger docs", { details: err }));
+      next(createHttpError(500, "Can't load swagger docs"));
   }
 };
