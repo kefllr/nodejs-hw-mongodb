@@ -347,7 +347,7 @@
                   "properties": {
                     "status": {
                       "type": "integer",
-                      "example": 201
+                      "example": 200
                     },
                     "message": {
                       "type": "string",
@@ -540,10 +540,7 @@
                 "type": "object",
                 "required": [
                   "name",
-                  "phoneNumber",
-                  "email",
-                  "isFavourite",
-                  "contactType"
+                  "phoneNumber"
                 ],
                 "properties": {
                   "name": {
