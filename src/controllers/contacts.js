@@ -21,17 +21,16 @@ export const contactsController = async(req, res, )=>{
     });
 };
 
-export const createContactControler = async(req, res) =>{
-    const {body, file} = req;
-    const contacts = await createContacts({...body, photo: file}, req.user._id) ;
-
+export const createContactControler = async (req, res) => {
+    const { body, file } = req;
+    const contact = await createContacts({ ...body, photo: file }, req.user._id);
+  
     res.status(201).json({
-        status: 201,
-        message: 'Successfully create contact !',
-        data: contacts,
+      status: 201,
+      message: `Successfully created student!`,
+      data: contact,
     });
-
-};
+  };
 
 export const deleteContactControler = async(req, res, next) =>{
     const id = req.params.contactId;

@@ -51,9 +51,16 @@ export const getContactsId = async (contactId) => {
     return await Contact.findOne({_id: contactId});
 };
 
-export const createContacts = async ({photo, ...payload}, userId) =>{
+export const createContacts = async ({ photo, ...payload }, userId) => {
   const url = await saveFile(photo);
-    return await Contact.create({...payload,parentId: userId,  photoUrl: url});
+
+  const contact = await Contact.create({
+    ...payload,
+    parentId: userId,
+    photoUrl: url,
+  });
+
+  return contact;
 };
 
 export const deleteContacts = async (contactId, userId) =>{
